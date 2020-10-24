@@ -1,0 +1,5 @@
+1)In clasa Main se creaza un obiect de clasa Loader 
+iar acesta va apela metoda readJson unde ca parametru va primi fisierl json care contine reteaua petri.
+2)Se foloseste obiectul de clasa Loader pentru a citi locatiile si tranzitiile ce se salveaza in variabile de tipul ArrayList<>
+prin apelarea metodelor readPlaces si readTransitions;.
+3)Se creaza un obict de clasa Simulation si se va apela metoda run unde se da ca parametri listele de locati si tranziti.
