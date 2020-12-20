@@ -1,0 +1,63 @@
+/*
+	Example: A tip calculation FIS (fuzzy inference system)
+	Calculates tip based on 'servie' and 'food'
+
+	If you want to about this example (and fuzzy logic), please
+	read Matlab's tutorial on fuzzy logic toolbox
+	http://www.mathworks.com/access/helpdesk/help/pdf_doc/fuzzy/fuzzy.pdf
+
+									Pablo Cingolani
+									pcingola@users.sourceforge.net
+*/
+
+FUNCTION_BLOCK tipper	// Block definition (there may be more than one block per file)
+
+VAR_INPUT // Define input variables
+targetAdc : REAL;
+currentAdc : REAL;
+END_VAR
+
+VAR_OUTPUT // Define output variable
+result : REAL;
+END_VAR
+
+FUZZIFY targetAdc
+TERM lowTemp := (0, 1) (100, 0);
+TERM normalTemp := (100, 0) (150, 1) (200, 0);
+TERM highTemp := (200, 0) (250, 1);
+END_FUZZIFY
+
+FUZZIFY currentAdc
+TERM lowTemp := (0, 1) (100, 0);
+TERM normalTemp := (100, 0) (150, 1) (200, 0);
+TERM highTemp := (200, 0) (250, 1);
+END_FUZZIFY
+
+DEFUZZIFY result
+TERM cold := (0,0) (50, 1) (100, 0);
+TERM medium:= (100,0) (150,1) (200,0);
+TERM hot := (200,0) (225,1) (255,0);
+
+
+METHOD : COG; // Use 'Center Of Gravity' defuzzification method
+DEFAULT := 0; // Default value is 0 (if no rule activates defuzzifier)
+END_DEFUZZIFY
+
+RULEBLOCK No1
+AND : MIN; // Use 'min' for 'and' (also implicit use 'max' for 'or' to fulfill DeMorgan's Law)
+ACT : MIN; // Use 'min' activation method
+ACCU : MAX; // Use 'max' accumulation method
+
+RULE 1 : IF targetAdc IS lowTemp AND currentAdc IS lowTemp THEN result IS cold;
+RULE 2 : IF targetAdc IS lowTemp AND currentAdc IS normalTemp THEN result IS cold;
+RULE 3 : IF targetAdc IS lowTemp AND currentAdc IS highTemp THEN result IS cold;
+RULE 4 : IF targetAdc IS normalTemp AND currentAdc IS lowTemp THEN result IS hot;
+RULE 5 : IF targetAdc IS normalTemp AND currentAdc IS normalTemp THEN result IS medium;
+RULE 6 : IF targetAdc IS normalTemp AND currentAdc IS highTemp THEN result IS cold;
+RULE 7 : IF targetAdc IS highTemp AND currentAdc IS lowTemp THEN result IS hot;
+RULE 8 : IF targetAdc IS highTemp AND currentAdc IS normalTemp THEN result IS hot;
+RULE 9 : IF targetAdc IS highTemp AND currentAdc IS highTemp THEN result IS cold;
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
